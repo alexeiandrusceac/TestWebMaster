@@ -5,8 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -18,21 +21,21 @@ import androidx.appcompat.widget.Toolbar;
 public class RegisterActivity extends AppCompatActivity {
     private final AppCompatActivity compatRegisterActivity = RegisterActivity.this;
 
-    private TextInputEditText userNameInputValue;
+    private TextInputEditText nickNameValue;
     private TextInputLayout userNameInputLayout;
     private TextInputEditText workerFirstNameInputValue;
     private TextInputEditText workerFirstNameInputLayout;
     private TextInputEditText workerLastNameInputValue;
     private TextInputLayout workerLastNameInputLayout;
     private TextInputEditText passwordInputValue;
-
+    private Registration registration;
     private TextInputLayout passwordInputLayout;
     private TextInputLayout workerTitleLayout;
     private AppCompatSpinner workerTitleSpinner;
     private TextInputEditText confPasswdInputValue;
     private TextInputLayout confPasswordInputLayout;
     private AppCompatButton registerButton;
-
+    private TextInputEditText emailInputValue;
     private AppCompatImageView userImageValue;
     private TextInputLayout userBirthdayLayout;
     private TextInputEditText userBirthdayValue;
@@ -42,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     public String data;
     Intent loginActivity;
 
+    User user = new User();
     BroadcastReceiver myBroadCastReceiver;
 
     @Override
@@ -54,29 +58,28 @@ public class RegisterActivity extends AppCompatActivity {
     void initUI() {
         loginActivity = new Intent(compatRegisterActivity, LoginActivity.class);
 
-        userNameInputLayout = (TextInputLayout) findViewById(R.id.user_name_layout);
-        workerLastNameInputValue = (TextInputEditText) findViewById(R.id.worker_prename_text);
-        workerLastNameInputLayout = (TextInputLayout) findViewById(R.id.worker_prename_layout);
-        passwordInputLayout = (TextInputLayout) findViewById(R.id.user_pass_layout);
-        confPasswordInputLayout = (TextInputLayout) findViewById(R.id.user_confpass_layout);
-        workerFirstNameInputValue = (TextInputEditText) findViewById(R.id.user_name_text);
+        userNameInputLayout = (TextInputLayout) findViewById(R.id.nickname_layout);
+        nickNameValue = (TextInputEditText) findViewById(R.id.nickname_text);
+        passwordInputLayout = (TextInputLayout) findViewById(R.id.pass_layout);
+        passwordInputValue = (TextInputEditText) findViewById(R.id.pass_text);
+        confPasswordInputLayout = (TextInputLayout) findViewById(R.id.confpass_layout);
 
-        workerTitleSpinner = (AppCompatSpinner) findViewById(R.id.user_title_text);
-        passwordInputValue = (TextInputEditText) findViewById(R.id.user_pass_text);
-        confPasswdInputValue = (TextInputEditText) findViewById(R.id.user_confpass_text);
-        userImageValue = (AppCompatImageView) findViewById(R.id.userImage);
-        userBirthdayLayout = (TextInputLayout) findViewById(R.id.user_birth_layout);
+        emailInputValue = (TextInputEditText) findViewById(R.id.email_text);
 
-
+        confPasswdInputValue = (TextInputEditText) findViewById(R.id.confpass_text);
+        registration = new Registration(getApplicationContext());
         registerButton = (AppCompatButton) findViewById(R.id.register_button);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.register_app_toolbar);
-        registerButton.setOnClickListener((View.OnClickListener) this);
-        userImageValue.setOnClickListener(new View.OnClickListener() {
-
+        registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  utils.openImagePopupMenu(userImageValue);
+                registerUser(nickNameValue.getText().toString(),passwordInputValue.getText().toString(),emailInputValue.getText().toString());
+            }
+        });
+
+
+        //  utils.openImagePopupMenu(userImageValue);
                /* PopupMenu popupMenu = new PopupMenu(compatActivity, userImageValue);
                 popupMenu.getMenuInflater().inflate(R.menu.photo_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -109,19 +112,9 @@ public class RegisterActivity extends AppCompatActivity {
                 });
 
                 popupMenu.show();*/
-            }
-        });
-        //setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+    }
 
-            @Override
-            public void onClick(View v) {
-                startActivity(loginActivity);
-                finish();
-            }
-        });
+    //setSupportActionBar(toolbar);
       /*  myBroadCastReceiver = new BroadcastReceiver();
         registerNetworkBroadcast();
 
@@ -137,7 +130,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 */
-  //  private void registerUser() {
+    //  private void registerUser() {
       /*  if (!valUserData.textFilled(userNameInputValue, userNameInputLayout, getString(R.string.error_name))) {
             return;
         }
@@ -165,8 +158,13 @@ public class RegisterActivity extends AppCompatActivity {
             // Snack Bar to show error message that record already exists
             Snackbar.make(scrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show();
         }*/
-    }
+    private void registerUser(String nickname, String password, String email) {
+        user.Nickname = nickname;
+        user.Password = password;
+        user.Email = email;
 
+        registration.registerUser(user);
+    }
 
     @Override
     protected void onDestroy() {

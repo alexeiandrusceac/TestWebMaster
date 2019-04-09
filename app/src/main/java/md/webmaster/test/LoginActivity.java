@@ -1,10 +1,12 @@
 package md.webmaster.test;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,7 +34,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.widget.NestedScrollView;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
-    long  touchDownTime = 0;
+    long touchDownTime = 0;
     private final AppCompatActivity compatActivity = LoginActivity.this;
     private NestedScrollView scrollView;
     private TextView networkView;
@@ -42,14 +44,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextInputEditText passwordInputEditText;
     private AppCompatButton loginButton;
     private TextView registerLink;
-   /* private ValidationWorkerInputData valWorkerInput;
-    private DataBaseHelper workerDBHelper;*/
+    /* private ValidationWorkerInputData valWorkerInput;
+     private DataBaseHelper workerDBHelper;*/
     private AppBarLayout appBarLayout;
     private TextView orRegister;
-    // private Toolbar loginToolbar;
-   /*WorkerSession session;
+
+    private User user;
     BroadcastReceiver myBroadCastReceiver;
-    WebInteractionService webInteractionService;*/
+    private Authentication authentication;
+
+    // WebInteractionService webInteractionService;*/
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,26 +67,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
        /* workerDBHelper = DataBaseHelper.getInstance(this);
         session = new WorkerSession(getApplicationContext());
 */
+        user = new User();
+        authentication = new Authentication(getApplicationContext());
         ///Initializarea obiectelor din activity
         scrollView = (NestedScrollView) findViewById(R.id.scroll);
-        nameLayout = (TextInputLayout) findViewById(R.id.user_name_layout);
+        nameLayout = (TextInputLayout) findViewById(R.id.nickname_layout);
         passwordLayout = (TextInputLayout) findViewById(R.id.password_layout);
         nameInputEditText = (TextInputEditText) findViewById(R.id.user_name_text);
         passwordInputEditText = (TextInputEditText) findViewById(R.id.password_Input);
-        orRegister = (TextView) findViewById(R.id.orRegister);
         loginButton = (AppCompatButton) findViewById(R.id.login_button);
         registerLink = (TextView) findViewById(R.id.registerlink);
-       //myBroadCastReceiver = new BroadcastReceiver();
-
+        myBroadCastReceiver = new CheckNetworkConnectionReceiver();
         //CoordinatorLayout layout = (CoordinatorLayout) findViewById(R.id.coordinatorlayout);
         // Initializarea Listeners
-        loginButton.setOnClickListener( this);
-        registerLink.setOnClickListener( this);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                user.Nickname = nameInputEditText.getText().toString();
+                user.Password = passwordInputEditText.getText().toString();
+                loginUser(user);
+            }
+        });
+        registerLink.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent registerIntent = new Intent(getApplicationContext(), RegisterActivity.class);
+                                                startActivity(registerIntent);
+                                                finish();
+                                            }
+                                        }
+
+        );
 
        /* valWorkerInput = new ValidationWorkerInputData(compatActivity);
         myBroadCastReceiver = new BroadcastReceiver();*/
-      //  registerNetworkBroadcast();
-
+        //
+        registerNetworkBroadcast();
         scrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -93,6 +114,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    private void loginUser(User user) {
+
+        boolean suc = authentication.Authentication(user);
+
+        if (suc) {
+            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(mainIntent);
+            finish();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -100,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-   /* private void registerNetworkBroadcast() {
+    private void registerNetworkBroadcast() {
         registerReceiver(myBroadCastReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
@@ -110,7 +142,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-    }*/
+    }
     /*@Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -139,34 +171,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //        }*/
 //    }
 
-//   s
+    //   s
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       // unregisterNetworkChanges();
+        unregisterNetworkChanges();
     }
 
     @Override
     public void onClick(View v) {
 
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //if (requestCode == IntentID) {
-            if (resultCode == RESULT_OK) {
 
-                //If result code is OK then get String extra and set message
-                String message = data.getStringExtra("message");
-              //  resultMessage.setText(message);
+
+    public class CheckNetworkConnectionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            try {
+                /*Uri url = new Uri();*/
+            } catch (Exception ex) {
+                ex.getMessage();
+
             }
-
-            if (resultCode == RESULT_CANCELED)
-
-                //When result is cancelled display toast
-                Toast.makeText(this, "Activity cancelled.", Toast.LENGTH_SHORT).show();
-
-
-       // }
+        }
     }
 }

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Web Master Studio Test</string>
+    <string name="nickname">Nickname</string>
+    <string name="password">Parola</string>
+    <string name="email">Email</string>
+    <string name="register">Inregistrează</string>
+    <string name="login">Logheaza-te</string>
+    <string name="test">TEST</string>
+    <string name="confPassword">Confirmati parola</string>
+    <string name="no_account">Nu aveti cont? Va rugam sa va inregistrati</string>
 </resources>
