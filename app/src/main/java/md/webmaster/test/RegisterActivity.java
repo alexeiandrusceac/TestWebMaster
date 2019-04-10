@@ -9,6 +9,8 @@ import android.view.View;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.apache.http.HttpResponse;
+
 import java.util.Objects;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
     public DatePickerDialog datepicker;
     public String data;
     Intent loginActivity;
-
+    HttpResponse  httpResponse ;
     User user = new User();
     BroadcastReceiver myBroadCastReceiver;
 
@@ -163,7 +165,9 @@ public class RegisterActivity extends AppCompatActivity {
         user.Password = password;
         user.Email = email;
 
-        registration.registerUser(user);
+       String string = registration.registerUser(user);
+
+
     }
 
     @Override

@@ -1,62 +1,80 @@
 package md.webmaster.test;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AUTH;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Authentication {
     private String AUTH_URL = "http://start.webpower.cf/test/auth/";
-    private Context mContext;
+    private Activity mContext;
     private Boolean succes = false;
-
-    public Authentication(Context context) {
-        this.mContext = context;
+    private StringBuilder resultAuthentication = null;
+    public Authentication(Activity activity) {
+        this.mContext = activity;
     }
 
-    public boolean Authentication(final User user) {
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(AUTH_URL);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-                    conn.setRequestProperty("Accept", "application/json");
-                    conn.setDoOutput(true);
-                    conn.setDoInput(true);
+    public StringBuilder authentication(final User user) {
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        StringBuilder sb = new StringBuilder();
+                        HttpURLConnection client = null;
+                        try {
+                            URL url = new URL(AUTH_URL);
+                            client = (HttpURLConnection) url.openConnection();
+                            client.setDoOutput(true);
+                            client.setDoInput(true);
+                            client.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                            client.setRequestProperty("Authorization", "Basic " + Base64.encodeToString(":pwd".getBytes(), Base64.NO_WRAP));
+                            client.setRequestMethod("POST");
 
-                    JSONObject jsonParam = new JSONObject();
-                    jsonParam.put("nickname", user.Nickname);
-                    jsonParam.put("password", user.Password);
-                    Log.i("JSON", jsonParam.toString());
-                    DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                    //os.writeBytes(URLEncoder.encode(jsonParam.toString(), "UTF-8"));
-                    os.writeBytes(jsonParam.toString());
+                            client.connect();
 
-                    os.flush();
-                    os.close();
+                            int httpResult = client.getResponseCode();
+                            if (httpResult == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(
+                                        client.getInputStream(), "utf-8"));
+                                String line = null;
+                                while ((line = br.readLine()) != null) {
+                                    sb.append(line + "\n");
+                                }
+                                resultAuthentication = sb;
+                                br.close();
+                            }
+                        } catch
+                        (Exception ex) {
+                            ex.printStackTrace();
 
-                    Log.i("STATUS", String.valueOf(conn.getResponseCode()));
-                    Log.i("MSG", conn.getResponseMessage());
+                        } finally {
+                            client.disconnect();
+                        }
 
-                    conn.disconnect();
-                    succes = true;
-                    // Toast.makeText(mContext,conn.getResponseMessage(),Toast.LENGTH_SHORT);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                   // Toast.makeText(mContext, ex.getMessage(), Toast.LENGTH_SHORT);
 
-                }
-            }}.start();
-        return succes;
+                    }
+                }).start();
+        return resultAuthentication;
     }
 
 }

@@ -1,5 +1,7 @@
 package md.webmaster.test;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,15 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetData {
-    private String DATA_URL = "http://start.webpower.cf/test/data/";
+    private static String DATA_URL = "http://start.webpower.cf/test/data/";
     //final String[] array = {"name", "activity", "age", "e-mail", "image"};
-    public ThisClass thisClass;
-    private List<ThisClass> listOfPeople;
+    public static ThisClass thisClass;
+    private static List<ThisClass> listOfPeople;
 
-    public ThisClass getData() {
+    public static ThisClass getData() {
 
-
-        listOfPeople = new ArrayList<ThisClass>();
+        //listOfPeople = new ArrayList<ThisClass>();
         thisClass = new ThisClass();
         Thread thread = new Thread(
                 new Runnable() {
@@ -80,6 +81,18 @@ public class GetData {
                 });
         thread.start();
         return thisClass;
+    }
+
+    public static class TaskAsync extends AsyncTask<ThisClass,ThisClass,ThisClass>{
+        private Context cantext;
+        public TaskAsync(Context context){
+            this.cantext = context;
+        }
+
+        @Override
+        protected ThisClass doInBackground(ThisClass... thisClasses) {
+            return getData();
+        }
     }
 
     public static class ThisClass {

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -29,8 +30,8 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public TableLayout tl;
     public List<GetData.ThisClass> list = new ArrayList<GetData.ThisClass>();
-    public GetData.ThisClass clasa = new GetData.ThisClass();
-
+   public GetData.ThisClass clasa;
+private ImageView imageview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         GetData getData = new GetData();
 
+
         clasa = getData.getData();
+       // AsyncTask<GetData.ThisClass, GetData.ThisClass, GetData.ThisClass> clasa = new GetData.TaskAsync(getApplicationContext()).execute();
+
+        imageview = (ImageView) findViewById(R.id.image);
         //if (clasa != null) {
         try {
             addData();
@@ -103,9 +108,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         t4v.setGravity(Gravity.CENTER);
         tbrow.addView(t4v);
 
+        // tbrow.addView(imageView);
+        stk.addView(tbrow);
 
         //Drawable drawable = loadImageFromWebOperations(thisClass.image);
-      final   ImageView imageView = new ImageView(this);
+     // final   ImageView imageView = new ImageView(this);
         final Bitmap[] image = new Bitmap[1];
         new Thread(new Runnable() {
                @Override
@@ -125,10 +132,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                }
            }).start();
 
-        imageView.setImageBitmap(image[0]);
-        tbrow.addView(imageView);
-        // tbrow.addView(imageView);
-        stk.addView(tbrow);
+        imageview.setImageBitmap(image[0]);
+
 
     }
 

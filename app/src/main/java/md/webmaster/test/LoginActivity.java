@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.JsonReader;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewManager;
@@ -28,6 +29,9 @@ import com.planning.nacleica.WebInteractionService.WebResponse;
 import com.planning.nacleica.adminactions.adminActivity;
 import com.planning.nacleica.database.DataBaseHelper;
 */
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -68,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         session = new WorkerSession(getApplicationContext());
 */
         user = new User();
-        authentication = new Authentication(getApplicationContext());
+        authentication = new Authentication(this);
         ///Initializarea obiectelor din activity
         scrollView = (NestedScrollView) findViewById(R.id.scroll);
         nameLayout = (TextInputLayout) findViewById(R.id.nickname_layout);
@@ -116,12 +120,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void loginUser(User user) {
 
-        boolean suc = authentication.Authentication(user);
+        StringBuilder resultAuth = authentication.authentication(user);
+        if (resultAuth != null) {
+            try {
+                JSONObject jsonObject = new JSONObject(resultAuth.toString());
+                Toast.makeText(compatActivity, (jsonObject.getString("error") != "")? jsonObject.getString("error") : jsonObject.getString("success")  , Toast.LENGTH_LONG).show();
+                if (jsonObject.getString("error") == "") {
+                    Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(mainIntent);
+                    finish();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-        if (suc) {
-            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(mainIntent);
-            finish();
+
         }
     }
 
